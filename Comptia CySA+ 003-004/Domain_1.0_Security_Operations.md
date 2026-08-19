@@ -198,11 +198,3 @@ Key takeaways: Hybrid is common; segmentation + zero trust reduce risk; SASE is 
 ### Cardholder Data (CHD)
 - PAN, cardholder name, expiration; CVV has special handling (often not stored)
 - PCI DSS: segment, minimize storage, encrypt, scan regularly
-
----
-
-If you want, I can:
-- Commit this formatted file to cpenas94/WGU on the `main` branch (I will verify the repo/branch before writing), or
-- Make additional edits (add examples, merge duplicate sections, or create a study checklist/flashcards).
-
-Which would you like next?
