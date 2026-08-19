@@ -1,371 +1,208 @@
-# Domain 1.0 Security Operations 
+# Domain 1.0 — Security Operations
+
+---
+
+## Table of contents
+- Logging levels
+- Windows registry
+- File structure & config locations
+- System processes
+- Hardware architecture
+- Infrastructure concepts (Serverless / Virtualization / Containerization)
+- Network architecture & segmentation
+- Identity & access management (IAM)
+- Encryption & PKI
+- Sensitive data protection
+
+---
+
+## Logging levels (0–7)
+| Level | Name      | Description               | Example                 |
+|------:|:----------|:--------------------------|:------------------------|
+| 0     | Emergency | System unusable           | Kernel panic            |
+| 1     | Alert     | Immediate action needed   | RAID failure            |
+| 2     | Critical  | Critical conditions       | Hardware failure        |
+| 3     | Error     | Error conditions          | App crash               |
+| 4     | Warning   | Warning conditions        | High CPU usage          |
+| 5     | Notice    | Normal but significant    | Config change           |
+| 6     | Info      | Informational messages    | Service start           |
+| 7     | Debug     | Debug-level messages      | Troubleshooting details |
+
+- Mnemonic: Eager Astronauts Cook Eggs While Navigating Into Darkness
+
+---
+
+## Windows Registry
+- Structure: five root keys (hives)
+  - HKEY_CLASSES_ROOT (HKCR) — COM registrations, file associations
+  - HKEY_LOCAL_MACHINE (HKLM) — System info: drivers, services, installed software
+  - HKEY_USERS (HKU) — All user accounts
+  - HKEY_CURRENT_USER (HKCU) — Current user's settings
+  - HKEY_CURRENT_CONFIG (HKCC) — Hardware profile info
+- System hardening guidance: CIS Benchmarks, DoD STIGs
+
+---
+
+## File structure (OS locations)
+- Purpose: Organizes storage/access; important for forensics and anomaly detection
+
+Common locations:
+- Windows
+  - Registry (HKLM / HKCU)
+  - C:\ProgramData, C:\Program Files, C:\Windows\System32
+- Linux
+  - /etc (configuration), /var/log (logs), /home (user data), /usr, /opt
+- macOS
+  - ~/Library/Preferences, /Library/Preferences
+
+---
+
+## System processes
+- Overview: Core OS tasks — monitor to detect anomalies/malware.
+- Windows core processes (examples)
+  - ntoskrnl.exe — C:\Windows\System32 — NT kernel (PID 4)
+  - smss.exe — Session Manager
+  - csrss.exe — Client/Server Runtime Subsystem
+  - wininit.exe — Initialization
+  - services.exe — Service Control Manager
+  - lsass.exe — Local Security Authority
+- Linux monitoring: ps, top, htop; init/systemd is PID 1
+
+---
+
+## Hardware architecture
+- x86 (Intel/AMD): Dominant for desktops/servers — common malware target
+- ARM: Mobile/IoT; Apple M1/M2 use ARM — binaries compiled for x86 generally won't run natively on ARM
+- Security implication: architecture mismatches can limit malware, but emulation and cross-compilation exist
+
+---
+
+## Infrastructure concepts
+
+### 1) Serverless (FaaS)
+- Definition: Run functions in response to events; no server provisioning required (e.g., AWS Lambda, Azure Functions)
+- Process: Event → Provider provisions runtime/container → Function runs → Container torn down → Billing per execution
+- Pros: Cost-effective, no server maintenance, auto-scaling, rapid dev
+- Cons: Execution time limits, cold starts, vendor lock-in, harder debugging
+- Security implications & mitigations:
+  - Treat functions as code: secure coding, input validation
+  - Principle of least privilege for IAM roles
+  - Use API gateways, secure secrets, logging/monitoring
+
+### 2) Virtualization (VMs)
+- Definition: Create full guest OS instances via a hypervisor
+  - Type 1 (bare-metal): ESXi, Hyper-V
+  - Type 2 (hosted): VirtualBox
+- Pros: Strong isolation, OS diversity, snapshots, migrations
+- Cons: Resource overhead, hypervisor is a single point of failure
+- Security implications & mitigations:
+  - Risk of VM escape, hypervisor vulnerabilities
+  - Harden hypervisor, isolate management interfaces, network segmentation
+
+### 3) Containerization
+- Definition: Package apps and dependencies; containers share host kernel (Docker, Kubernetes)
+- Pros: Lightweight, portable, fast startup, efficient resource use
+- Cons: Shared kernel risk, less isolation than VMs, image supply-chain risks
+- Security implications & mitigations:
+  - Kernel exploits can affect all containers
+  - Use image scanning, signing, minimal base images, runtime controls (seccomp, AppArmor), network/pod policies
 
-## Logging Levels (0-7)
-| Level |	Name | Description | Example |
-| :---- | :--- | :---------- | :------ |
-| 0 | Emergency |	System unusable |	Kernel panic
-| 1	| Alert |	Immediate action needed |	RAID failure
-| 2	| Critical |	Critical conditions |	Hardware failure
-| 3	| Error |	Error conditions |	App crash
-| 4	| Warning |	Warning conditions |	High CPU usage
-| 5	| Notice | 	Normal but significant |	Config change
-| 6	| Info |	Informational messages |	Service start
-| 7	| Debug | Debug-level messages |	Troubleshooting details
+Exam tip: Serverless ≠ containers/VMs. Use serverless for event-driven stateless functions, containers for microservices, VMs for legacy/strong isolation.
 
-- Mnemonic Phrase:
-  - Eager Astronauts Cook Eggs While Navigating Into Darkness
+---
 
+## Network architecture
 
-## Windows Registry:
-- Key Details
-- Structure: Five root keys (hives):
-- Root Key				Description
-- HKEY_CLASSES_ROOT (HKCR)	COM object registration, file associations
-- HKEY_LOCAL_MACHINE (HKLM)	System info (tasks, services)
-- HKEY_USERS (HKU)			User account info
-- HKEY_CURRENT_USER (HKCU)	Current user info
-- HKEY_CURRENT_CONFIG (HKCC)	Hardware profile info
+### On-premises
+- Components: routers, switches, firewalls, IDS/IPS, NAC, UTM, access points
+- Topology: core → distribution → access layers; VLANs for segmentation
+- Best practices: patch hardware, limit ACLs, physical controls, monitor via NAC
 
-System Hardening: CIS Benchmarks and or DoD STIGS for guidance
+### Cloud
+- Components/providers: AWS, Azure, GCP; use VPCs, security groups, IAM
+- Shared responsibility model: provider secures infra; you secure config, identities, data
+- Best practices: least privilege IAM, encryption, centralized logging (CloudTrail), regular audits
 
+### Hybrid
+- Combine on-prem + cloud; secure links via VPN, Direct Connect, ExpressRoute
+- Best practices: unified identity, consistent monitoring, CASB for visibility
 
-File Structure
-Overview
-File structure organizes data storage/access. Key for forensics and identifying anomalies.
-Key Details
-Hierarchical: 		Root directory (/) with subdirectories.
-Windows:		C:\Windows\System32 (system files), C:\Program Files/Data (apps/config).
-Linux: 			/etc (configs), /var/log (logs), /home (user data).
-macOS: 		~/Library/Preferences, /Library/Preferences.
+### Network segmentation
+- Methods: physical separation, VLANs/ACLs, microsegmentation (app-level)
+- Benefits: limit lateral movement, contain breaches
+- Threats: VLAN hopping, misconfigured ACLs
 
-Configuration File Locations
-OS		Common Locations
-Windows	Registry (HKLM/HKCU), C:\ProgramData, C:\Program Files
-Linux		/etc/, /usr, /opt, /var
-macOS	~/Library/Preferences, /Library/Preferences
+### Zero Trust
+- Principle: "Never trust, always verify" — verify all access requests continuously
+- Components: MFA, microsegmentation, continuous monitoring, JIT access
 
+### SASE (Secure Access Service Edge)
+- Cloud-delivered combination of SD-WAN + security services (FWaaS, CASB, ZTNA)
+- Use for identity-centric and global policy enforcement
 
+### SDN (Software-Defined Networking)
+- Decouples control plane from data plane; uses controllers and APIs
+- Secure controllers, secure APIs, and isolate management plane
 
+Key takeaways: Hybrid is common; segmentation + zero trust reduce risk; SASE is useful for remote/cloud setups.
 
+---
 
+## Identity & Access Management (IAM)
 
+### Single Sign-On (SSO)
+- Allows logging in once to access multiple services
+- Exam tip: SSO is often within an organization; federation spans organizations
 
+### Federation
+- Share identity across domains (SAML, OAuth, OpenID Connect)
+- Roles: Identity Provider (IdP) vs Service Provider (SP)
 
+### Privileged Access Management (PAM)
+- Controls and monitors privileged accounts; provides just-in-time elevation, session recording
 
+### Passwordless
+- Authentication without passwords: biometrics, hardware tokens (YubiKey), magic links
+- Use possession + inherence factors where possible
 
+### CASB (Cloud Access Security Broker)
+- Gateway between users and cloud services to enforce policies (visibility, compliance, threat protection, data security)
 
-System Processes:
-Overview
-System processes are core OS tasks. Monitoring detects anomalies/malware.
-Key Details
-Windows Core:
-Process	Location/PID	Role
-ntoskrnl.exe	C:\Windows\System32	NT kernel (PID 4)
-smss.exe	System32	Session manager
-csrss.exe	System32	Client runtime subsystem
-wininit.exe	System32	Initialization
-services.exe	System32	Service control
-lsass.exe	System32	Local security
-Linux: ps, top, htop for monitoring; systemd (PID 1).
+---
 
-Hardware Architecture:
-Overview
-Hardware dictates software compatibility/security (e.g., x86 vs. ARM).
-Key Details
-x86 (AMD/Intel): Dominant in desktops/servers; malware targets it.
-ARM: Mobile/IoT; emulation possible but non-native malware may fail.
-Security Impact: Malware compiled for one arch fails on another; Apple M1/M2 (ARM) resists x86 malware.
+## Encryption & PKI
 
+### Encryption
+- Protects confidentiality and integrity of data at rest and in transit
+- Use strong algorithms, proper key management, and rotate keys regularly
 
+### Public Key Infrastructure (PKI)
+- Components: Certificate Authority (CA), Registration Authority (RA), certificate repository, management system
+- Flow: Request → RA verifies → CA issues certificate → revoke via CRL/OCSP when needed
+- SSL/TLS inspection: decrypts/inspects TLS traffic; requires trusted root and has privacy/compatibility implications (not for pinned certs)
 
+---
 
-Infrastructure Concepts:
+## Sensitive data protection
 
-1. Serverless
+### Data Loss Prevention (DLP)
+- Pillars: Discover & classify, monitor, enforce
+- Enforcement actions: alert, block, quarantine
+- Use DLP on endpoints, networks, and cloud
 
-Definition and How It Works
-Serverless computing (often Function as a Service or FaaS) runs code in response to events without provisioning or managing servers.
-Functions execute on-demand in a managed cloud environment (e.g., AWS Lambda, Azure Functions, Google Cloud Functions).
+### Personally Identifiable Information (PII)
+- Direct identifiers: SSN, passport, full name + identifying attributes
+- Indirect identifiers: DOB + ZIP combination
+- Regulated by GDPR, CCPA — treat sensitive PII with stronger controls
 
-Process: Event triggers → Cloud provider spins up a container → Code runs → Container destroyed → Billed only for execution time.
-No persistent state; stateless functions scale automatically.
+### Cardholder Data (CHD)
+- PAN, cardholder name, expiration; CVV has special handling (often not stored)
+- PCI DSS: segment, minimize storage, encrypt, scan regularly
 
-Pros
-Cost-effective (pay-per-use).
-No server maintenance (patching, scaling).
-Auto-scaling for high availability.
-Rapid development and deployment.
+---
 
-Cons
-Limited execution time (e.g., 15 minutes max).
-Cold starts (delay on first invocation).
-Vendor lock-in.
-Debugging and monitoring challenges.
-Security Implications
+If you want, I can:
+- Commit this formatted file to cpenas94/WGU on the `main` branch (I will verify the repo/branch before writing), or
+- Make additional edits (add examples, merge duplicate sections, or create a study checklist/flashcards).
 
-Treat functions as code: Apply secure coding, input validation.
-Shared responsibility: Provider secures runtime; you secure code, IAM, secrets.
-
-Risks: Event data injection, insecure APIs, function permissions overreach.
-
-Mitigations: Least privilege IAM roles, API gateways, logging/monitoring functions.
-
-
-
-
-
-
-2. Virtualization
-Definition and How It Works
-Virtualization creates virtual versions of hardware (e.g., VMs) on physical hosts using a hypervisor.
-Hypervisor (Type 1: bare-metal like VMware ESXi/Hyper-V; Type 2: hosted like VirtualBox) abstracts hardware for guest OSes.
-Multiple VMs (each with full OS) run on one physical server, sharing resources.
-
-Process: Physical host → Hypervisor allocates CPU/RAM/storage → VMs boot independently.
-
-Pros
-Resource efficiency (one server = many VMs).
-Isolation between VMs.
-Easy snapshots/backups/migration.
-Supports diverse OSes on same hardware.
-
-Cons
-Hypervisor single point of failure.
-Resource contention (noisy neighbors).
-Higher overhead (full OS per VM).
-Complex management at scale.
-Security Implications
-Hypervisor vulnerabilities affect all VMs.
-VM escape attacks (rare but critical).
-
-Risks: Shared hardware, migration exposes data.
-
-Mitigations: Hypervisor hardening, VM isolation, network segmentation, anti-VM detection evasion.
-
-3. Containerization
-Definition and How It Works
-Containerization packages apps with dependencies (libs, configs) into portable units sharing the host OS kernel.
-
-Tools: Docker, Kubernetes. No full guest OS; lightweight.
-
-Process: Host OS → Container engine (e.g., Docker daemon) → Containers run isolated processes.
-Multiple containers on one host; orchestrated for scaling.
-
-Pros
-Lightweight/fast (no OS overhead).
-Portable across environments.
-Efficient resource use.
-Quick startup/scaling.
-
-Cons
-Shared kernel vulnerability affects all containers.
-Less isolation than VMs.
-Complex orchestration (e.g., Kubernetes).
-Image security risks.
-Security Implications
-Kernel exploits compromise all containers.
-
-
-Risks: Container breakout, insecure images, privilege escalation.
-Mitigations: Runtime security (e.g., seccomp), image signing/scanning, network policies, pod security standards.
-
-Exam Tips:
-
-Serverless ≠ Containers/VMs: No persistent state; focus on functions/code security.
-
-VMs > Containers: VMs for OS diversity/strong isolation; containers for speed/lightweight apps.
-
-Scenarios: High-scale/microservices → Containers; no ops overhead → Serverless; legacy OS → VMs.
-
-Distractors: Confuse with "cloud" (all are); watch for "hypervisor" (VMs only) or "kernel sharing" (containers).
-
-Network Architecture:
-
-On-Premises Network Architecture
-
-Definition
-On-premises (or traditional physical) network architecture relies on organization-owned hardware like routers, switches, firewalls, cabling, and access points deployed in local data centers or offices. It forms the foundational "physical" layer of most enterprise networks.
-
-Key Components and Design
-Hardware: Routers, switches, firewalls, intrusion detection/prevention systems (IDS/IPS), content filters, network access control (NAC), unified threat management (UTM) devices.
-
-Security Features:
-Firewalls control traffic between zones.
-IDS/IPS detect/block attacks.
-NAC authenticates devices before granting access.
-UTM combines multiple functions (firewall, IDS/IPS, filtering).
-
-Topology: Typically hierarchical (core, distribution, access layers) with VLANs for logical separation.
-
-Security Implications
-Vulnerabilities: Firmware exploits, misconfigurations, insider threats.
-
-Best Practices:
-Regular patching of devices.
-Least privilege on ACLs.
-Physical access controls (locks, cameras).
-Monitoring for rogue devices via NAC/port security.
-Threats: DDoS, scanning/sweeping, unauthorized access.
-
-Cloud Network Architecture
-Definition
-Cloud architecture offloads infrastructure to providers like AWS, Azure, or Google Cloud. Resources (compute, storage, networking) are provisioned on-demand via APIs. Shared responsibility model: Provider secures the cloud; user secures data/applications.
-Deployment Models: Public (multi-tenant), Private (single-tenant), Community (shared by similar orgs), Hybrid (mix).
-Security Features: Security groups (virtual firewalls), VPCs (isolated networks), IAM roles.
-
-Security Implications
-Vulnerabilities: Misconfigured IAM, exposed S3 buckets, API flaws.
-
-Best Practices:
-Use IAM least privilege.
-Encrypt data at rest/transit.
-Enable logging (CloudTrail).
-Regular audits with tools like ScoutSuite.
-Threats: Data exfiltration, account compromise.
-
-Hybrid Network Architecture
-Definition
-Hybrid combines on-premises infrastructure with public/private cloud, allowing data/apps to move between them.
-
-Key Components and Design
-Integration: VPNs, Direct Connect, ExpressRoute for secure links.
-Management: Tools like Azure Arc or AWS Outposts extend on-prem controls to cloud.
-
-Security Implications
-Vulnerabilities: Inconsistent policies across environments.
-
-Best Practices:
-Unified identity (federation).
-Consistent encryption/monitoring.
-CASB for cloud visibility.
-
-Threats: Lateral movement between on-prem/cloud.
-
-Network Segmentation
-Definition
-Divides network into isolated zones/subnets to limit lateral movement, contain breaches, and enforce granular controls.
-
-Key Components and Design
-Methods:
-Type			Description				Example
-
-Physical		Separate hardware.		Dedicated switches.
-
-Logical/Virtual	VLANs, ACLs, firewalls.	SDN policies.
-
-Microsegmentation	App-level isolation.		Zero trust.
-
-Security Implications
-
-Best Practices: VLANs, firewalls between zones, NAC.
-Threats: VLAN hopping, improper ACLs.
-
-Zero Trust
-Definition
-Security model assuming no implicit trust; verify every access request regardless of origin.
-
-Key Components and Design
-
-Principles: Never trust, always verify; assume breach.
-Elements: MFA, microsegmentation, continuous monitoring.
-
-Security Implications
-Best Practices: Least privilege, JIT access, encryption everywhere.
-Threats: Over-reliance on perimeter security.
-
-Secure Access Secure Edge (SASE)
-Definition
-Cloud-delivered security framework combining networking (SD-WAN) and security (FWaaS, CASB, ZTNA).
-
-Key Components and Design
-Integrated Services: SD-WAN, ZTNA, SWG, CASB, DLP.
-
-
-
-Security Implications
-Best Practices: Global visibility, identity-centric access.
-Threats: Misconfigured SASE policies.
-
-Software-Defined Networking (SDN)
-Definition
-Programmable network architecture decoupling control plane (routing decisions) from data plane (packet forwarding).
-
-Key Components and Design
-Planes: Control (decisions), Data (forwarding), Management (monitoring).
-APIs: Northbound (apps to controller), Southbound (controller to devices).
-
-Security Implications
-Best Practices: Secure APIs, controller isolation.
-Threats: Controller compromise.
-
-Key Takeaways and Exam Tips
-Hybrid Dominance: Most orgs use hybrid; focus on integration/security gaps.
-Segmentation First: Always segment; use zero trust/microsegmentation.
-Zero Trust Everywhere: Verify identity/context continuously.
-SASE for Modern Networks: Ideal for remote/cloud-heavy setups.
-SDN Automation: Enables dynamic policy enforcement.
-
-Identity and Access Management (IAM)
-Identity and Access Management (IAM) refers to the frameworks, processes, and technologies used to manage digital identities, authenticate users, and control access to resources. IAM ensures that only authorized entities (users, devices, or services) can access systems, data, or applications based on defined policies. It supports principles like least privilege and separation of duties, reducing risks from unauthorized access.
-
-Single Sign-On (SSO)
-Definition: SSO allows users to authenticate once and access multiple applications/services without re-entering credentials.
-
-Exam Tip: SSO ≠ Federation. SSO is often within one organization; Federation spans organizations. Pair SSO with MFA for security.
-
-Federation
-Definition: Federation enables sharing of identity information across organizations or systems, allowing users from one domain to access resources in another via trusted relationships.
-
-Exam Tip: Federation uses standards like SAML (XML-based assertions) or OAuth (authorization framework). Know IdP vs. SP roles.
-
-Privileged Access Management (PAM)
-Definition: PAM controls, monitors, and secures access to privileged accounts (e.g., admin, root) and elevates privileges temporarily.
-
-Exam Tip: PAM focuses on high-privilege accounts (e.g., service accounts, break-glass). Differs from IAM by emphasizing least privilege and session monitoring.
-
-Passwordless
-Definition: Passwordless authentication verifies identity without passwords, using biometrics, hardware tokens, or magic links (e.g., email one-time codes).
-
-Exam Tip: Passwordless often uses possession/inherence factors. Examples: Windows Hello, YubiKey.
-
-Cloud Access Security Broker (CASB)
-Definition: CASB is a security tool acting as a gateway between users and cloud services to enforce policies.
-
-Exam Tip: CASB's four pillars: Visibility, Compliance, Threat Protection, Data Security. Inline vs. API proxy.
-
-Encryption
-Encryption converts plaintext into ciphertext using algorithms/keys, ensuring confidentiality/integrity.
-
-Public Key Infrastructure (PKI)
-Definition: PKI is a framework for managing digital certificates and public-key encryption, enabling secure communication/authenticity.
-
-
-Components:
-Certificate Authority (CA): Issues/signs certificates.
-Registration Authority (RA): Verifies certificate requests.
-Certificate Repository: Stores certificates/CRLs.
-Certificate Management System: Handles lifecycle.
-
-Exam Tip: PKI flow: Request → RA verifies → CA issues/signs. CRLs revoke certs.
-
-Secure Sockets Layer (SSL) Inspection
-Definition: SSL/TLS inspection decrypts/inspects encrypted traffic (e.g., HTTPS) for threats while preserving privacy.
-
-Exam Tip: Essential for HTTPS threats. Requires breaking TLS (trusted root CA). Not for pinned certs.
-
-Sensitive Data Protection
-Protects confidential data from unauthorized access/disclosure via classification, controls, and tools.
-
-Data Loss Prevention (DLP)
-Definition: DLP prevents unauthorized data exfiltration via policies on endpoints/networks/cloud.
-
-Exam Tip: DLP pillars: Discover/classify, monitor, enforce. Remediations: Alert/block/quarantine.
-Personally Identifiable Information (PII)
-Definition: PII identifies individuals (direct: SSN; indirect: combo like DOB+ZIP).
-Examples: Name, address, SSN, email, IP, biometrics.
-Exam Tip: Sensitive PII (e.g., SSN, health) needs stricter controls. GDPR/CCPA regulate.
-Cardholder Data (CHD)
-Definition: CHD from payment cards (PAN, name, expiry, CVV).
-Protection: PCI DSS (segment/store minimally, encrypt, DLP).
-Exam Tip: CHD ≠ full card details (CVV excluded post-auth). PCI requires quarterly scans.
-
+Which would you like next?
