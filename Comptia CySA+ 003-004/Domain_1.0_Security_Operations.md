@@ -1,27 +1,30 @@
-Domain 1.0 Security Operations 
+# Domain 1.0 Security Operations 
 
-Logging Levels (0-7)ey Levels (Syslog Standard, Levels 0-7)
-Level	Name	Description	Example
-0	Emergency	System unusable	Kernel panic
-1	Alert	Immediate action needed	RAID failure
-2	Critical	Critical conditions	Hardware failure
-3	Error	Error conditions	App crash
-4	Warning	Warning conditions	High CPU usage
-5	Notice	Normal but significant	Config change
-6	Info	Informational messages	Service start
-7	Debug	Debug-level messages	Troubleshooting details
+## Logging Levels (0-7)
+| Level |	Name | Description | Example |
+| :---- | :--- | :---------- | :------ |
+| 0 | Emergency |	System unusable |	Kernel panic
+| 1	| Alert |	Immediate action needed |	RAID failure
+| 2	| Critical |	Critical conditions |	Hardware failure
+| 3	| Error |	Error conditions |	App crash
+| 4	| Warning |	Warning conditions |	High CPU usage
+| 5	| Notice | 	Normal but significant |	Config change
+| 6	| Info |	Informational messages |	Service start
+| 7	| Debug | Debug-level messages |	Troubleshooting details
 
-Eager Astronauts Cook Eggs While Navigating Into Darkness
+- Mnemonic Phrase:
+  - Eager Astronauts Cook Eggs While Navigating Into Darkness
 
-Windows Registry:
-Key Details
-Structure: Five root keys (hives):
-Root Key				Description
-HKEY_CLASSES_ROOT (HKCR)	COM object registration, file associations
-HKEY_LOCAL_MACHINE (HKLM)	System info (tasks, services)
-HKEY_USERS (HKU)			User account info
-HKEY_CURRENT_USER (HKCU)	Current user info
-HKEY_CURRENT_CONFIG (HKCC)	Hardware profile info
+
+## Windows Registry:
+- Key Details
+- Structure: Five root keys (hives):
+- Root Key				Description
+- HKEY_CLASSES_ROOT (HKCR)	COM object registration, file associations
+- HKEY_LOCAL_MACHINE (HKLM)	System info (tasks, services)
+- HKEY_USERS (HKU)			User account info
+- HKEY_CURRENT_USER (HKCU)	Current user info
+- HKEY_CURRENT_CONFIG (HKCC)	Hardware profile info
 
 System Hardening: CIS Benchmarks and or DoD STIGS for guidance
 
