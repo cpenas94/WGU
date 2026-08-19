@@ -28,7 +28,7 @@
 | 6     | Info      | Informational messages    | Service start           |
 | 7     | Debug     | Debug-level messages      | Troubleshooting details |
 
-- Mnemonic: Eager Astronauts Cook Eggs While Navigating Into Darkness
+> **Mnemonic:** Eager Astronauts Cook Eggs While Navigating Into Darkness
 
 ---
 
