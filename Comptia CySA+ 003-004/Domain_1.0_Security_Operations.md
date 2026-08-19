@@ -1,4 +1,4 @@
-# Domain 1.0 — Security Operations
+# Domain 1.1 — Security Operations
 
 ---
 
