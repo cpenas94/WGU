@@ -10,6 +10,8 @@ The notes in this folder are collected for course review and exam preparation.
 
 - [Cloud Security Practice Exams](https://wguexams.github.io/cloud-security/) — External practice resource hosted by WGU Exams on GitHub Pages. Credit goes to the original creators.
 
+- [(Quizlet) Cloud Security Practice Exams](https://quizlet.com/1027914151/d320-oa-review-flash-cards/) — External practice hosted on Quizlet. Credit goes to the original creators.
+
 ## How I’m Studying
 
 1. Read through the notes.
