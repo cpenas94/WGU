@@ -25,6 +25,10 @@ Each file includes topic headings, a contents list, previous/next navigation, an
 - [Laws, regulations, and organizations study guide](LawsRegsOrgsStudyGuide.pdf)
 - [How to attack the questions](1747096020613_1HowtoAttacktheQuestions.png)
 
+## Autosave Practice Quiz
+
+- [D320 Quiz Autosave Tool](quiz-autosave/) — AI-assisted companion for the external WGUEXAMS quiz, with saved progress, 20/40/117-question sessions, and answer review. See the linked folder for setup instructions and source attribution. The original question bank is not included.
+
 ## Practice Exams
 
 - [Cloud Security Practice Exams](https://wguexams.github.io/cloud-security/) — External practice resource hosted by WGU Exams on GitHub Pages. Credit goes to the original creators.
