@@ -6,6 +6,14 @@ This repository contains notes from the courses and certification material I've 
 
 ---
 
+## 📖 Course Directories
+
+- [D320 — Managing Cloud Security (CCSP)](D320%20Managing%20Cloud%20Security%20CCSP/)
+- [D332 — Penetration Testing and Vulnerability Analysis (PenTest+ PT0-003)](D332%20Penetration%20Testing%20and%20Vulnerability%20Analysis/) — notes in progress
+- [CompTIA CySA+ 003–004](Comptia%20CySA%2B%20003-004/)
+
+---
+
 ## 📚 What's Included
 
 Notes cover topics such as:
